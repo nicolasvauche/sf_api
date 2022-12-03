@@ -4,40 +4,54 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserRepository;
+use App\State\UserPasswordHasherProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    paginationEnabled: false,
+    normalizationContext: ['groups' => ['get:Users']],
+    denormalizationContext: ['groups' => ['post:User']],
+    processor: UserPasswordHasherProcessor::class
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('get:Users')]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['get:Users', 'post:User'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['get:Users', 'post:User'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['post:User'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get:Users', 'post:User'])]
     private ?string $pseudo = null;
 
     #[ORM\Column]
+    #[Groups(['get:Users', 'post:User'])]
     private ?bool $active = null;
 
     #[ORM\Column]
     #[Gedmo\Timestampable(on: 'create')]
+    #[Groups(['get:Users'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
@@ -64,7 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
