@@ -6,7 +6,7 @@ import './Main.scss'
 
 function Main () {
   return (
-    <h1>Coucou</h1>
+    <h1>Vinylothèque</h1>
   )
 }
 
