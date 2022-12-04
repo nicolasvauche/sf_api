@@ -1,16 +1,20 @@
 import React from 'react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import LayoutDefault from './components/Layout/LayoutDefault'
 import './Main.scss'
 
-function Main () {
-  return (
-    <h1>Vinylothèque</h1>
-  )
-}
-
-export default Main
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <LayoutDefault page="home" />,
+  },
+  {
+    path: '/connexion',
+    element: <LayoutDefault page="login" />
+  },
+])
 
 if (document.getElementById('app')) {
   const rootElement = document.getElementById('app')
@@ -18,7 +22,7 @@ if (document.getElementById('app')) {
 
   root.render(
     <StrictMode>
-      <Main />
+      <RouterProvider router={router} />
     </StrictMode>
   )
 }
