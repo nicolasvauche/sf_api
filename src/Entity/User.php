@@ -20,52 +20,51 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Put(),
-        new Patch(),
-        new Delete(),
+        new Get(security: "is_granted('ROLE_ADMIN') or object == user"),
+        new Put(security: "is_granted('ROLE_ADMIN') or object == user", processor: UserPasswordHasherProcessor::class),
+        new Delete(security: "is_granted('ROLE_ADMIN') or object == user"),
+        new GetCollection(security: "is_granted('ROLE_ADMIN')"),
+        new Post(security: "is_granted('ROLE_ADMIN')", processor: UserPasswordHasherProcessor::class),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object == user", processor: UserPasswordHasherProcessor::class),
     ],
-    normalizationContext: ['groups' => ['get:Users']],
-    denormalizationContext: ['groups' => ['post:User']],
-    paginationEnabled: false,
-    processor: UserPasswordHasherProcessor::class
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']],
+    paginationEnabled: false
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('get:Users')]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['get:Users', 'post:User'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['get:Users', 'post:User'])]
+    #[Groups(['user:read', 'user:write'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(['post:User'])]
+    #[Groups(['user:write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['get:Users', 'post:User'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $pseudo = null;
 
     #[ORM\Column]
-    #[Groups(['get:Users', 'post:User'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?bool $active = null;
 
     #[ORM\Column]
     #[Gedmo\Timestampable(on: 'create')]
-    #[Groups(['get:Users'])]
+    #[Groups(['user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
