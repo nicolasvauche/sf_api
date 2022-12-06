@@ -29,7 +29,7 @@ const LayoutDefault = ({ page }) => {
       setFetchError(null)
       console.clear()
     } catch (err) {
-      setFetchError(err.message)
+      setFetchError(err.response.data['hydra:description'])
     }
   }
 
@@ -91,8 +91,8 @@ const LayoutDefault = ({ page }) => {
 
         <section>
           <div className="content">
-            {page === 'home' && <Home />}
-            {page === 'login' && <Login apiUrl={apiUrl} />}
+            {page === 'home' && <Home jwt={jwt} />}
+            {page === 'login' && <Login token={jwt} apiUrl={apiUrl} />}
           </div>
         </section>
       </main>
